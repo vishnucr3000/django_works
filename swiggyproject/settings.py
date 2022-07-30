@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django',
     'rest_framework',
     'dishes',
+    'swiggyapi',
 ]
 
 MIDDLEWARE = [

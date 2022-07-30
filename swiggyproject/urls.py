@@ -16,10 +16,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from dishes import views as dview
+from swiggyapi.views import ProductsView as pview
+from swiggyapi.views import ProductDetailView as pdview
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('swiggy/dishes/', dview.DishesView.as_view()),
+    path('swiggy/dishes', dview.DishesView.as_view()),
     path('swiggy/dishdetail/<int:id>', dview.DishDetailView.as_view()),
+    path('swiggyapi/products',pview.as_view()),
+    path('swiggyapi/products/<int:id>',pdview.as_view())
 
 ]

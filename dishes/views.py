@@ -9,17 +9,20 @@ from dishes.models import menu_items
 class DishesView(APIView):
     def get(self, request, *args, **kwargs):
 
+
+        all_dishes=menu_items
+        print(request.query_params)
+
         if "dishname" in request.query_params:
             dishname=request.query_params.get("dishname")
-            dish = [dish for dish in menu_items if dish.get("dish_name")==dishname]
-            return Response(data=dish)
+            all_dishes = [dish for dish in all_dishes if dish.get("dish_name")==dishname]
+
+
 
         if "category" in request.query_params:
             categoryname=request.query_params.get("category")
-            dish=[dish for dish in menu_items if dish.get("category")==categoryname]
-            return Response(data=dish)
-
-        return Response(data=menu_items)
+            all_dishes=[dish for dish in all_dishes if dish.get("category")==categoryname]
+        return Response(data=all_dishes)
 
     def post(self, request, *args, **kwargs):
         newdish = request.data
