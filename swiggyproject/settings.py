@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'dishes',
     'swiggyapi',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
