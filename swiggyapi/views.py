@@ -2,9 +2,9 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from swiggyapi.serializers import ProductSerializer
-from swiggyapi.models import Products, Review
+from swiggyapi.models import Products, Review,Carts
 from django.contrib.auth.models import User
-from swiggyapi.serializers import ProductModelSerializer, UserModelSerializer, ReviewSerializer
+from swiggyapi.serializers import ProductModelSerializer, UserModelSerializer, ReviewSerializer,CartSerializer
 from rest_framework import status
 from rest_framework.viewsets import ViewSet
 from rest_framework.viewsets import ModelViewSet
@@ -16,6 +16,7 @@ from django.db import IntegrityError
 # Create your views here.
 
 class ProductsView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
     def get(self, request, *args, **kwargs):
         qs = Products.objects.all()
         seralizer = ProductSerializer(qs, many=True)
@@ -31,6 +32,7 @@ class ProductsView(APIView):
 
 
 class ProductDetailView(APIView):
+    permission_classes = permissions.IsAuthenticated
     def get(self, request, *args, **kwargs):
         id = kwargs.get("id")
         qs = Products.objects.get(id=id)
@@ -53,6 +55,7 @@ class ProductDetailView(APIView):
 
 
 class ProductsModelView(APIView):
+    permission_classes = permissions.IsAuthenticated
     def get(self, request, *args, **kwargs):
         qs = Products.objects.all()
         if "category" in request.query_params:
@@ -72,6 +75,7 @@ class ProductsModelView(APIView):
 
 
 class ProductModelDetailView(APIView):
+    permission_classes = permissions.IsAuthenticated
     def get(self, request, *args, **kwargs):
         id = kwargs.get("id")
         product = Products.objects.get(id=id)
@@ -140,8 +144,7 @@ class ProdcutViewSetView(ViewSet):
 class ProductModelViewSetView(ModelViewSet):
     serializer_class = ProductModelSerializer
     queryset = Products.objects.all()
-    authentication_classes = [authentication.TokenAuthentication]
-    permission_classes = [permissions.IsAuthenticated]
+
 
     @action(methods=['get'], detail=True)
     def get_review(self, request, *args, **kwargs):
@@ -164,6 +167,18 @@ class ProductModelViewSetView(ModelViewSet):
         except IntegrityError:
             message="Duplicates found"
             return Response(message)
+    @action(methods=["post"],detail=True)
+    def add_to_cart(self,request,*args,**kwargs):
+        id=kwargs.get("pk")
+        product=Products.objects.get(id=id)
+        user=request.user
+        serializer=CartSerializer(data=request.data,context={"user":user,"product":product})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data=serializer.data)
+        else:
+            return Response(data=serializer.errors)
+
 
 
 class UserModelView(ModelViewSet):
@@ -171,3 +186,18 @@ class UserModelView(ModelViewSet):
     queryset = User.objects.all()
     authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [permissions.IsAuthenticated]
+
+class CartsView(ModelViewSet):
+    serializer_class = CartSerializer
+    queryset = Carts.objects.all()
+
+
+    def list(self, request, *args, **kwargs):
+        carts=Carts.objects.filter(user=request.user)
+        serializer=CartSerializer(carts,many=True)
+        return Response(data=serializer.data)
+    def create(self, request, *args, **kwargs):
+        return Response(data={"Message" :"Not Allowed"})
+
+
+

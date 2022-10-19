@@ -21,13 +21,15 @@ from swiggyapi.views import ProductDetailView as pdview
 from swiggyapi.views import ProductsModelView as pmview
 from swiggyapi.views import ProductModelDetailView as pmdview
 from rest_framework.routers import DefaultRouter
-from swiggyapi.views import ProdcutViewSetView,ProductModelViewSetView,UserModelView
+from swiggyapi.views import ProdcutViewSetView,ProductModelViewSetView,UserModelView,CartsView
 from rest_framework.authtoken.views import obtain_auth_token
+from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView
 
 router=DefaultRouter()
 router.register('swiggyapi/v1/products', ProdcutViewSetView, basename="products")
 router.register('swiggyapi/v2/products',ProductModelViewSetView,basename="mproducts")
 router.register('swiggyapi/v2/register',UserModelView,basename="register")
+router.register('swiggyapi/carts',CartsView,basename="carts")
 
 
 urlpatterns = [
@@ -39,6 +41,8 @@ urlpatterns = [
     path('swiggyapi/productsmodel',pmview.as_view()),
     path('swiggyapi/productsmodel/<int:id>',pmdview.as_view()),
     path('swiggyapi/token',obtain_auth_token),
+    path('swiggyapi/token/jwt',TokenObtainPairView.as_view()),
+    path('swiggyapi/token/refresh',TokenRefreshView.as_view()),
 
 
 
